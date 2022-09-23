@@ -97,3 +97,32 @@ predict.svm2 <- predict(svm2, dados_novos)
 dados_novos <- cbind(dados_novos, predict.svm2)
 predict.svm3 <- predict(svm3, dados_novos)
 dados_novos <- cbind(dados_novos, predict.svm3)
+########################## SVN
+
+########################## Random Forest
+rf <- train(y~.,data=treino,method="rf")
+predict.rf <-predict(rf,teste)
+confusionMatrix(predict.rf,as.factor(teste$y))
+
+##Cross Validation
+ctrl <- trainControl(method = "cv", number = 10)
+rf2 <- train(y~.,data=treino,method="rf",trControl=ctrl)
+predict.rf2 <-predict(rf2,teste)
+confusionMatrix(predict.rf2,as.factor(teste$y))
+
+##Vários mtry
+tuneGrid = expand.grid(mtry=c(2,5,7,9))
+rf3 <- train(y~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
+predict.rf3 <- predict(rf3,teste)
+confusionMatrix(predict.rf3,as.factor(teste$y))
+
+##novos dados
+pred.rf <- predict(rf,dados_novos)
+dados_novos <- cbind(dados_novos,pred.rf)
+pred.rf2 <- predict(rf2,dados_novos)
+dados_novos <- cbind(dados_novos,pred.rf2)
+pred.rf3 <- predict(rf3,dados_novos)
+dados_novos <- cbind(dados_novos,pred.rf3)
+
+########################## Random Forest
+

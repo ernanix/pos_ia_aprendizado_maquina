@@ -117,4 +117,36 @@ dados_novos <- cbind(dados_novos, predict.svm3)
 
 ########################## SVN
 
+########################## Random Forest
+
+rf <- train(G3~.,data=treino,method="rf")
+predicoes.rf <- predict(rf,teste)
+
+rmse(teste$G3,predicoes.rf)
+r2(predicoes.rf,teste$G3)
+
+##Cross Validation
+ctrl <- trainControl(method="cv",number = 10)
+
+rf2 <- train(G3~.,data=treino,method="rf",trControl=ctrl)
+predicoes.rf2 <- predict(rf2,teste)
+
+rmse(teste$G3,predicoes.rf2)
+r2(predicoes.rf2,teste$G3)
+
+##Varios mtry
+tuneGrid = expand.grid(mtry=c(2,5,7,9))
+
+rf3 <- train(G3~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
+predicoes.rf3 <- predict(rf3,teste)
+rmse(teste$G3,predicoes.rf3)
+r2(predicoes.rf3,teste$G3)
+
+predict.rf <- predict(rf, dados_novos)
+dados_novos <- cbind(dados_novos, predict.rf)
+predict.rf2 <- predict(rf2, dados_novos)
+dados_novos <- cbind(dados_novos, predict.rf2)
+predict.rf3 <- predict(rf3, dados_novos)
+dados_novos <- cbind(dados_novos, predict.rf3)
+########################## Random Forest
 
