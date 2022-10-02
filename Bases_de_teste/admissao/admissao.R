@@ -1,8 +1,12 @@
 library("caret")
 library(Metrics)
 
-dados <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/admissao/admissao.csv')
-dados_novos <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/admissao/admissao.csv')
+##Maquina MP
+setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
+
+
+dados <- read.csv(file = 'admissao\\admissao.csv')
+dados_novos <- read.csv(file = 'admissao\\admissao.csv')
 
 set.seed(728078902)
 ### Cria arquivos de treino e teste
@@ -11,8 +15,20 @@ treino <- dados[ind,]
 teste <- dados[-ind,]
 
 ### Função R2
-r2 <- function(predito, observado) {
-  return(1 - (sum((predito-observado)^2) / sum((predito-mean(observado))^2)))
+F_r2 <- function(observado,predito) {
+  return(1 - (sum((observado-predito)^2) / sum((observado-mean(observado))^2)))
+}
+### Função MAE
+F_MAE <- function(observado,predito,base) {
+  return(sum(abs(observado-predito)) / nrow(base)) 
+}
+### Função RMSE
+F_RMSE <- function(observado,predito,base) {
+  return( sqrt(sum((observado-predito)^2) / nrow(base)) ) 
+}
+### Função Syx
+F_SYX <- function(observado,predito,base) {
+  return(sum((observado-predito)^2) / (nrow(base) - (length(base)-1) ) )
 }
 
 ########################## KNN
@@ -24,7 +40,8 @@ knn <- train(ChanceOfAdmit ~ ., data = treino, method = "knn",
 predict.knn <- predict(knn, teste)
 ### Mostra as métricas
 rmse(teste$ChanceOfAdmit, predict.knn)
-r2(predict.knn,teste$ChanceOfAdmit)
+r2(teste$ChanceOfAdmit,predict.knn)
+MAE(predict.knn,teste$ChanceOfAdmit)
 
 ### Novos casos
 predict.knn <- predict(knn, dados_novos)

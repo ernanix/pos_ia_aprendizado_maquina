@@ -1,19 +1,26 @@
 library("caret")
 
-dados <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/veiculos/veiculos.csv')
-dados_novos <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/veiculos/veiculos_novos.csv')
+setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
 
+dados <- read.csv(file = 'veiculos\\veiculos.csv')
+dados_novos <- read.csv(file = 'veiculos\\veiculos_novos.csv')
+
+### set seed
+set.seed(728078902)
+
+### retira id
 dados$a <- NULL
 dados_novos$a <- NULL
 
-set.seed(728078902)
 
+###Cria arquivo de treino e teste
 ran <- sample(1:nrow(dados), 0.8 * nrow(dados))
 treino <- dados[ran,] 
 teste <- dados[-ran,] 
 
+########################## KNN
 ### Faz um grid com valores para K e Executa o KNN
-tuneGrid <- expand.grid(k = c(1,3,5,7,9))
+tuneGrid <- expand.grid(k = c(1))
 
 knn <- train(tipo ~ ., data = treino, method = "knn",tuneGrid=tuneGrid)
 knn
@@ -28,3 +35,4 @@ predict.knn <- predict(knn, dados_novos)
 dados_novos$tipo <- NULL
 dados_novos <- cbind(dados_novos, predict.knn)
 
+########################## KNN

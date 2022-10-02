@@ -1,8 +1,11 @@
 library("caret")
 library(mice)
 
-dados <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/diabetes/diabetes.csv')
-dados_novos <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/diabetes/diabetes_novos.csv')
+##Maquina MP
+setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
+
+dados <- read.csv(file = 'diabetes\\diabetes.csv')
+dados_novos <- read.csv(file = 'diabetes\\diabetes_novos.csv')
 
 ### Set Seed
 set.seed(728078902)
@@ -14,7 +17,7 @@ teste <- dados[-ran,]
 
 ########################## KNN
 ### Faz um grid com valores para K e Executa o KNN
-tuneGrid <- expand.grid(k = c(1,3,5,7,9))
+tuneGrid <- expand.grid(k = c(9))
 knn <- train(diabetes~., data = treino, method = "knn",tuneGrid=tuneGrid)
 
 ### Faz a predição e mostra a matriz de confusão

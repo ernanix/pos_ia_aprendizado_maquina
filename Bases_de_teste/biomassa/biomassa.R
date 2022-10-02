@@ -8,9 +8,11 @@ library(caret)
 library(mice)
 library(Metrics)
 
+##Maquina MP
+setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
 
-dados <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/biomassa/biomassa.csv')
-dados_novos <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/biomassa/biomassa_novos.csv')
+dados <- read.csv(file = 'biomassa\\biomassa.csv')
+dados_novos <- read.csv(file = 'biomassa\\biomassa_novos.csv')
 
 ###Set seed
 set.seed(728078902)
@@ -22,6 +24,7 @@ teste <- dados[-ind,]
 
 ### Função R2
 r2 <- function(predito, observado) {
+  
   return(1 - (sum((predito-observado)^2) / sum((predito-mean(observado))^2)))
 }
 
@@ -40,6 +43,9 @@ predict.knn <- predict(knn, teste)
 ### Mostra as métricas
 rmse(teste$biomassa, predict.knn)
 r2(predict.knn,teste$biomassa)
+MAE(predict.knn,teste$biomassa)
+cor(predict.knn,teste$biomassa, method = c("pearson"))
+
 
 ### PREDIÇÕES DE NOVOS CASOS
 predict.knn <- predict(knn, dados_novos)

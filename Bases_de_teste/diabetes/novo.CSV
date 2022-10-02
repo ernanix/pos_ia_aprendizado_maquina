@@ -1,0 +1,49 @@
+AFASTAMENTO,DESCRICAO
+1,(AT) - ACIDENTE DE TRABALHO
+2,(AT2) - ACIDENTE DE TRABALHO - EST.
+3,(ADR) - AD REFERENDUM                     
+4,(AV) - ADVERTENCIA VERBAL                 
+5,(AFA) - AFASTAMENTO DA COMARCA            
+6,(AFU) - AFASTAMENTO DAS FUNCOES           
+7,(APA) - AFASTAMENTO DO PAIS               
+8,(C) - CEDENCIA COM ONUS P/M.P.            
+9,(CP) - COMPENSACAO PLANTAO                
+10,(CRS) - CURSO/EVENTOS                     
+11,(DS) - DESIGNA SERVIDOR                   
+12,(DETJ) - DETERMINACAO DO JUIZ             
+13,(D) - DISPONIBILIDADE                     
+14,(FIS) - FISIOTERAPIA                      
+15,(LJE) - LIC. JUST. ELEITORAL(ELEICOES)    
+16,(LIC) - LICENCA                           
+17,(LAM) - LICENCA AMAMENTACAO               
+18,(LCE) - LICENCA CONC. CARGO ELETIVO       
+19,(LRA) - LICENCA ESP REM APOSENTADORIA     
+20,(LEC) - LICENCA EXERCER CARGO ELET.       
+21,(LG) - LICENCA GALA                       
+22,(LGS) - LICENCA GESTANTE                  
+23,(LMC) - LICENCA MANDATO ELETIVO           
+24,(LN) - LICENCA NOJO                       
+25,(LAC) - LICENCA P/ACOMPANHAR CONJUGE      
+26,(LC) - LICENCA PARA CURSOS                
+27,(LPA) - LICENCA PATERNIDADE               
+28,(LSV) - LICENCA SEM VENCIMENTOS           
+29,(LT) - LICENCA TRANSITO                   
+30,(LPF) - LICENCA TRAT. FAMILIA             
+31,(LTI) - LICENCA TRATAR INTERESSES PART    
+32,(LTS) - LICENCA TRAT.SAUDE                
+33,(LTS2) - LICENCA TRAT.SAUDE - ESTATUTARIO.
+34,(MLF) - MEIO DIA DE LICENÇA FAMILIA       
+35,(MLS) - MEIO DIA DE LICENÇA SAUDE         
+36,(OUT) - OUTROS                            
+37,(RS) - REPREENDE SERVIDOR                 
+38,(SUS) - SUSPENDER                         
+39,(S) - SUSPENSAO                           
+40,(S6) - SUSPENSAO MAIOR CINCO DIAS         
+41,(T) - TRANSFERENCIA                       
+42,(TR) - TRANSFERENCIA P/OUTRO ORGAO        
+43,(TRS) - TRANSITO                          
+44,LICENÇA GESTANTE - 60 DIAS                
+45,TRATAMENTO SAÚDE (INSS)                   
+64,(LTS) - LICENCA TRAT.SAUDE INSS           
+84,LICENÇA GESTANTE - EFETIVO/MEMBRO         
+104,TELETRABALHO                             

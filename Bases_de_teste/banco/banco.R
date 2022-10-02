@@ -1,8 +1,11 @@
 library("caret")
 library(mice)
 
-dados <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/banco/banco.csv')
-dados_novos <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/banco/banco_novos.csv')
+##Maquina MP
+setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
+
+dados <- read.csv(file = 'banco\\banco.csv')
+dados_novos <- read.csv(file = 'banco\\banco_novos.csv')
 
 ### Set Seed
 set.seed(728078902)
