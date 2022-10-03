@@ -2,9 +2,11 @@ library("caret")
 
 ##Maquina MP
 setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
+##Note
+setwd('/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste')
 
-dados <- read.csv(file = 'veiculos\\veiculos.csv')
-dados_novos <- read.csv(file = 'veiculos\\veiculos_novos.csv')
+dados <- read.csv(file = paste('veiculos','veiculos.csv',sep ="/"))
+dados_novos <- read.csv(file = paste('veiculos','veiculos_novos.csv',sep ="/"))
 
 ### set seed
 set.seed(728078902)
