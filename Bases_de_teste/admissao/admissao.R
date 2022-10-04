@@ -3,10 +3,12 @@ library(Metrics)
 
 ##Maquina MP
 setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
+barra ="\\"
+##Note
+setwd('/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste')
+barra ="/"
 
-
-dados <- read.csv(file = 'admissao\\admissao.csv')
-dados_novos <- read.csv(file = 'admissao\\admissao.csv')
+dados <- read.csv(file = paste('admissao','admissao.csv',sep =barra))
 
 set.seed(728078902)
 ### Cria arquivos de treino e teste
@@ -16,7 +18,7 @@ teste <- dados[-ind,]
 
 ### Função R2
 F_r2 <- function(observado,predito) {
-  return(1 - (sum((observado-predito)^2) / sum((observado-mean(observado))^2)))
+  return (1 - (sum((predito-observado)^2) / sum((predito-mean(observado))^2)))
 }
 ### Função MAE
 F_MAE <- function(observado,predito,base) {
@@ -28,7 +30,16 @@ F_RMSE <- function(observado,predito,base) {
 }
 ### Função Syx
 F_SYX <- function(observado,predito,base) {
-  return(sum((observado-predito)^2) / (nrow(base) - (length(base)-1) ) )
+  val1 = sum((observado-predito)^2)
+  val2 = nrow(base) - (length(base)-1)
+  return (sqrt(val1 / val2))
+}
+### Função Pearson
+F_PEARSON <- function(observado,predito) {
+  val1 = sum((observado-mean(observado)) * (predito-mean(predito)))
+  val2 = sqrt(sum((observado-mean(observado))^2))
+  val3 = sqrt(sum((predito-mean(predito))^2))
+  return (val1 / (val2 * val3))
 }
 
 ########################## KNN
@@ -36,12 +47,16 @@ tuneGrid <- expand.grid(k = c(1,3,5,7,9))
 ### Executa o Knn com esse grid
 knn <- train(ChanceOfAdmit ~ ., data = treino, method = "knn",
              tuneGrid=tuneGrid)
+knn
 ### Aplica o modelo no arquivo de teste
 predict.knn <- predict(knn, teste)
+
 ### Mostra as métricas
-rmse(teste$ChanceOfAdmit, predict.knn)
-r2(teste$ChanceOfAdmit,predict.knn)
-MAE(predict.knn,teste$ChanceOfAdmit)
+F_r2(teste$ChanceOfAdmit,predict.knn)
+F_SYX(teste$ChanceOfAdmit,predict.knn,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.knn)
+F_RMSE(teste$ChanceOfAdmit,predict.knn,teste)
+F_MAE(teste$ChanceOfAdmit,predict.knn,teste)
 
 ### Novos casos
 predict.knn <- predict(knn, dados_novos)
@@ -51,28 +66,38 @@ dados_novos <- cbind(dados_novos, predict.knn)
 ########################## RNA
 ### Treino com Hold-Out
 rna <- train(ChanceOfAdmit~., data=treino, method="nnet", linout=T, trace=FALSE)
-predicoes.rna <- predict(rna, teste)
+rna
+
+predict.rna <- predict(rna, teste)
 
 ### Mostra as métricas
-rmse(teste$ChanceOfAdmit, predicoes.rna)
-r2(predicoes.rna, teste$ChanceOfAdmit)
+F_r2(teste$ChanceOfAdmit,predict.rna)
+F_SYX(teste$ChanceOfAdmit,predict.rna,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.rna)
+F_RMSE(teste$ChanceOfAdmit,predict.rna,teste)
+F_MAE(teste$ChanceOfAdmit,predict.rna,teste)
 
-### CV e parametrizacao da RNA
+### CV
 control <- trainControl(method = "cv", number = 10)
-tuneGrid <- expand.grid(size = seq(from = 1, to = 3, by = 1), decay = seq(from = 0.1, to = 0.7, by = 0.3))
-rna2 <- train(ChanceOfAdmit~., data=treino, method="nnet", trainControl=control, tuneGrid=tuneGrid, linout=T, MaxNWts=10000, maxit=2000, trace=F)
+rna_cv <- train(ChanceOfAdmit~., data=treino, method="nnet", trainControl=control, linout=T, trace=F)
+rna_cv
+predict.rna_cv <- predict(rna_cv, teste)
+F_r2(teste$ChanceOfAdmit,predict.rna_cv)
+F_SYX(teste$ChanceOfAdmit,predict.rna_cv,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.rna_cv)
+F_RMSE(teste$ChanceOfAdmit,predict.rna_cv,teste)
+F_MAE(teste$ChanceOfAdmit,predict.rna_cv,teste)
 
-### Predições e métricas
-predicoes.rna2 <- predict(rna2, teste)
-rmse(teste$ChanceOfAdmit, predicoes.rna2)
-r2(predicoes.rna2, teste$ChanceOfAdmit)
-
-### Novos casos
-predict.rna <- predict(rna, dados_novos)
-dados_novos <- cbind(dados_novos, predict.rna)
-predict.rna2 <- predict(rna2, dados_novos)
-dados_novos <- cbind(dados_novos, predict.rna2)
-
+###Parametrização
+tuneGrid <- expand.grid(size = seq(from = 1, to = 10, by = 1), decay = seq(from = 0.1, to = 0.9, by = 0.3))
+rna_par <- train(ChanceOfAdmit~., data=treino, method="nnet", trainControl=control, tuneGrid=tuneGrid, linout=T, MaxNWts=10000, maxit=2000, trace=F)
+rna_par
+predict.rna_par <- predict(rna_par, teste)
+F_r2(teste$ChanceOfAdmit,predict.rna_par)
+F_SYX(teste$ChanceOfAdmit,predict.rna_par,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.rna_par)
+F_RMSE(teste$ChanceOfAdmit,predict.rna_par,teste)
+F_MAE(teste$ChanceOfAdmit,predict.rna_par,teste)
 ########################## RNA
 
 ########################## SVN

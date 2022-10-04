@@ -3,9 +3,13 @@ library(mice)
 
 ##Maquina MP
 setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
+barra ="\\"
+##Note
+setwd('/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste')
+barra ="/"
 
-dados <- read.csv(file = 'banco\\banco.csv')
-dados_novos <- read.csv(file = 'banco\\banco_novos.csv')
+dados <- read.csv(file = paste('banco','banco.csv',sep =barra))
+dados_novos <- read.csv(file = paste('banco','banco_novos.csv',sep =barra))
 
 ### Set Seed
 set.seed(728078902)
@@ -35,6 +39,7 @@ dados_novos <- cbind(dados_novos, predict.knn)
 ########################## RNA
 ########## Treinar o modelo com Hold-out
 rna <- train(y~., data=treino, method="nnet",trace=FALSE)
+rna
 ### Predições dos valores do conjunto de teste
 predict.rna <- predict(rna, teste)
 ### Matriz de confusão
@@ -44,24 +49,26 @@ confusionMatrix(predict.rna, as.factor(teste$y))
 ### indica o método cv e numero de folders 10
 ctrl <- trainControl(method = "cv", number = 10)
 ### executa a RNA com esse ctrl
-rna2 <- train(y~., data=treino, method="nnet",trace=FALSE, trControl=ctrl)
-predict.rna2 <- predict(rna2, teste) 
-confusionMatrix(predict.rna2, as.factor(teste$y))
+rna_cv <- train(y~., data=treino, method="nnet",trace=FALSE, trControl=ctrl)
+rna_cv
+predict.rna_cv <- predict(rna_cv, teste) 
+confusionMatrix(predict.rna_cv, as.factor(teste$y))
 
 ########### Parametrização da RNA
 ### size, decay
-grid <- expand.grid(size = seq(from = 1, to = 35, by = 10),decay = seq(from = 0.1, to = 0.6, by = 0.3))
+grid <- expand.grid(size = seq(from = 1, to = 45, by = 10),decay = seq(from = 0.1, to = 0.9, by = 0.3))
 
-rna3 <- train(
+rna_par <- train(
   form = y~. , 
   data = treino , 
   method = "nnet" , 
   tuneGrid = grid , 
   trControl = ctrl , 
-  maxit = 2000,trace=FALSE) 
+  maxit = 2000,trace=FALSE)
+rna_par
 ### Faz as predições e mostra matriz de confusão
-predict.rna3 <- predict(rna3, teste)
-confusionMatrix(predict.rna3, as.factor(teste$y))
+predict.rna_par <- predict(rna_par, teste)
+confusionMatrix(predict.rna_par, as.factor(teste$y))
 
 ### PREDIÇÕES DE NOVOS CASOS
 predict.rna <- predict(rna, dados_novos)
