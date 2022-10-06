@@ -36,12 +36,6 @@ knn
 predict.knn <- predict(knn, teste)
 confusionMatrix(predict.knn, as.factor(teste$tipo))
 
-### PREDIÇÕES DE NOVOS CASOS
-
-predict.knn <- predict(knn, dados_novos)
-dados_novos$tipo <- NULL
-dados_novos <- cbind(dados_novos, predict.knn)
-
 ########################## KNN
 
 ########################## RNA
@@ -71,3 +65,24 @@ rna_par
 predict.rna_par <- predict(rna_par,teste)
 confusionMatrix(predict.rna_par,as.factor(teste$tipo))
 ########################## RNA
+
+########################## SVM
+svm <- train(tipo~.,data=treino,method="svmRadial")
+svm
+predict.svm <- predict(svm,teste)
+confusionMatrix(predict.svm,as.factor(teste$tipo))
+
+###Cross Validation
+ctrl <- trainControl(method="cv",number=10)
+svm_cv <- train(tipo~.,data=treino,method="svmRadial",trControl=ctrl)
+svm_cv
+predict.svm_cv <- predict(svm_cv,teste)
+confusionMatrix(predict.svm_cv,as.factor(teste$tipo))
+
+###Parametrização
+tuneGrid = expand.grid(C=c(1,2,10,50,100),sigma=c(.01,.015,0.2))
+svm_par <- train(tipo~.,data=treino,method="svmRadial",trControl=ctrl,tuneGrid=tuneGrid)
+svm_par
+predict.svm_par <- predict(svm_par,teste)
+confusionMatrix(predict.svm_par,as.factor(teste$tipo))
+########################## SVM
