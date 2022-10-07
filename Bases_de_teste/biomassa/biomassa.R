@@ -149,9 +149,23 @@ F_MAE(teste$biomassa,predicoes.svm_par,teste)
 ########################## Novos Casos
 
 ########################## Gráfico de Resíduos
-plot( (((teste$biomassa - predict.knn)/teste$biomassa) * 100 ~ predict.knn),
+teste$biomassa
+predict.knn
+resid = ((teste$biomassa - predict.knn)/teste$biomassa) * 100
+
+plot(resid ~ predict.knn,
       xlab="Valor estimado",
-      ylab="Resíduos (%)",)
+      ylab="Resíduos (%)",
+      col=2)
+abline(h=0)
+
+x = c(7.820,15.670,31.800)
+y = c(-10.608204,-52.135922,-14.060258)
+
+plot( y ~ x,
+      xlab="Valor estimado",
+      ylab="Resíduos (%)",
+      col=2)
 abline(h=0)
 ########################## Gráfico de Resíduos
 
