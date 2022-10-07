@@ -1,5 +1,6 @@
 library("caret")
 library("mice")
+library(mlbench)
 
 ##Maquina MP
 setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
@@ -11,45 +12,31 @@ barra ="/"
 dados <- read.csv(file = paste('previsao_tempo','previsao_tempo.csv',sep =barra))
 dados_novos <- read.csv(file = paste('previsao_tempo','previsao_tempo_novos.csv',sep =barra))
 
-### Set Seed
-set.seed(728078902)
 
 ### Cria arquivos de treino e teste
+set.seed(728078902)
 ran <- sample(1:nrow(dados), 0.8 * nrow(dados))
 treino <- dados[ran,] 
 teste <- dados[-ran,] 
 
 ########################## KNN
-### Faz um grid com valores para K e Executa o KNN
+set.seed(728078902)
 tuneGrid <- expand.grid(k = c(1,3,5,7,9))
-
 knn <- train(Chovera~., data = treino, method = "knn",tuneGrid=tuneGrid)
 knn
-
-### Faz a predição e mostra a matriz de confusão
 predict.knn <- predict(knn, teste)
 confusionMatrix(predict.knn, as.factor(teste$Chovera))
-
-### PREDIÇÕES DE NOVOS CASOS
-
-predict.knn <- predict(knn, dados_novos)
-dados_novos$Chovera <- NULL
-dados_novos <- cbind(dados_novos, predict.knn)
 ########################## KNN
 
 ########################## RNA
-imp <- mice(dados)
-dados <- complete(imp,1)
-
-########## Treinar o modelo com Hold-out
+set.seed(728078902)
 rna <- train(Chovera~.,data=treino,method="nnet",trace=FALSE)
 rna
-
-### Faz a predição e mostra a matriz de confusão
 predict.rna <-predict(rna,teste)
 confusionMatrix(predict.rna,as.factor(teste$Chovera))
 
 ###Cross Validation
+set.seed(728078902)
 ctrl <- trainControl(method = "cv", number = 10)
 rna_cv <- train(Chovera~.,data=treino,method="nnet",trace=FALSE,trControl=ctrl)
 rna_cv
@@ -58,10 +45,66 @@ confusionMatrix(predict.rna_cv,as.factor(teste$Chovera))
 
 
 ###Parametrização
-grid <-expand.grid(size=seq(from=1,to=45,by=10),decay=seq(from=0.1, to=0.9, by=0.3))
+set.seed(728078902)
+grid <-expand.grid(size=seq(from=1,to=45,by=10),decay=seq(from=0.01, to=0.9, by=0.3))
 rna_par <- train(form=Chovera~., data=treino, method="nnet", tuneGrid=grid, trControl=ctrl, maxit=2000, trace=FALSE)
 rna_par
-
 predict.rna_par <- predict(rna_par,teste)
 confusionMatrix(predict.rna_par,as.factor(teste$Chovera))
 ########################## RNA
+
+########################## SVM
+set.seed(728078902)
+svm <- train(Chovera~.,data=treino,method="svmRadial")
+svm
+predict.svm <- predict(svm,teste)
+confusionMatrix(predict.svm,as.factor(teste$Chovera))
+
+###Cross Validation
+set.seed(728078902)
+ctrl <- trainControl(method="cv",number=10)
+svm_cv <- train(Chovera~.,data=treino,method="svmRadial",trControl=ctrl)
+svm_cv
+predict.svm_cv <- predict(svm_cv,teste)
+confusionMatrix(predict.svm_cv,as.factor(teste$Chovera))
+
+###Parametrização
+set.seed(728078902)
+tuneGrid = expand.grid(C=c(1,2,10,50,100),sigma=c(.01,.015,0.2))
+svm_par <- train(Chovera~.,data=treino,method="svmRadial",trControl=ctrl,tuneGrid=tuneGrid)
+svm_par
+predict.svm_par <- predict(svm_par,teste)
+confusionMatrix(predict.svm_par,as.factor(teste$Chovera))
+########################## SVM
+
+########################## Random Forest
+set.seed(728078902)
+rf <- train(Chovera~.,data=treino,method="rf")
+rf
+predict.rf <- predict(rf,teste)
+confusionMatrix(predict.rf,as.factor(teste$Chovera))
+
+###Cross Validation
+set.seed(728078902)
+ctrl <- trainControl(method="cv",number=10)
+rf_cv <- train(Chovera~.,data=treino,method="rf",trControl=ctrl)
+rf_cv
+predict.rf_cv <- predict(rf_cv,teste)
+confusionMatrix(predict.rf_cv,as.factor(teste$Chovera))
+
+###Parametrização
+set.seed(728078902)
+tuneGrid = expand.grid(mtry=c(2, 5, 7, 9))
+rf_par <- train(Chovera~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
+rf_par
+predict.rf_par <- predict(rf_par,teste)
+confusionMatrix(predict.rf_par,as.factor(teste$Chovera))
+
+########################## Random Forest
+
+########################## Novos casos
+dados_novos$Chovera <-NULL
+predict.melhor_modelo <- predict(rf_par,dados_novos)
+dados_novos <-cbind(dados_novos,predict.melhor_modelo)
+View(dados_novos)
+########################## Novos casos
