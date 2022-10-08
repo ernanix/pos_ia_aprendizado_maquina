@@ -131,42 +131,69 @@ set.seed(728078902)
 tuneGrid = expand.grid(C=c(1, 2, 10, 50, 100), sigma=c(.01, .015, 0.2))
 svm_par <- train(biomassa~., data=treino, method="svmRadial", trControl=ctrl, tuneGrid=tuneGrid)
 svm_par
-predicoes.svm_par <- predict(svm_par, teste)
+predict.svm_par <- predict(svm_par, teste)
 
-F_r2(teste$biomassa,predicoes.svm_par)
-F_SYX(teste$biomassa,predicoes.svm_par,teste)
-F_PEARSON(teste$biomassa,predicoes.svm_par)
-F_RMSE(teste$biomassa,predicoes.svm_par,teste)
-F_MAE(teste$biomassa,predicoes.svm_par,teste)
+F_r2(teste$biomassa,predict.svm_par)
+F_SYX(teste$biomassa,predict.svm_par,teste)
+F_PEARSON(teste$biomassa,predict.svm_par)
+F_RMSE(teste$biomassa,predict.svm_par,teste)
+F_MAE(teste$biomassa,predict.svm_par,teste)
 
 ########################## SVN
 
 ########################## Random Forest
+set.seed(728078902)
+rf <- train(biomassa~.,data=treino,method="rf")
+rf 
+predict.rf <- predict(rf,teste)
 
+F_r2(teste$biomassa,predict.rf)
+F_SYX(teste$biomassa,predict.rf,teste)
+F_PEARSON(teste$biomassa,predict.rf)
+F_RMSE(teste$biomassa,predict.rf,teste)
+F_MAE(teste$biomassa,predict.rf,teste)
+
+###Cross Validation
+set.seed(728078902)
+ctrl <-trainControl(method="cv",number=10)
+rf_cv <- train(biomassa~.,data=treino,method="rf",trControl=ctrl)
+rf_cv
+predict.rf_cv <- predict(rf_cv,teste)
+
+F_r2(teste$biomassa,predict.rf_cv)
+F_SYX(teste$biomassa,predict.rf_cv,teste)
+F_PEARSON(teste$biomassa,predict.rf_cv)
+F_RMSE(teste$biomassa,predict.rf_cv,teste)
+F_MAE(teste$biomassa,predict.rf_cv,teste)
+
+###Parametrização
+set.seed(728078902)
+tuneGrid = expand.grid(mtry=c(2,5,7,9))
+rf_par <- train(biomassa~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
+rf_par
+predict.rf_par <- predict(rf_par,teste)
+
+F_r2(teste$biomassa,predict.rf_par)
+F_SYX(teste$biomassa,predict.rf_par,teste)
+F_PEARSON(teste$biomassa,predict.rf_par)
+F_RMSE(teste$biomassa,predict.rf_par,teste)
+F_MAE(teste$biomassa,predict.rf_par,teste)
 ########################## Random Forest
 
 ########################## Novos Casos
+
 ########################## Novos Casos
 
 ########################## Gráfico de Resíduos
-teste$biomassa
-predict.knn
+
 resid = ((teste$biomassa - predict.knn)/teste$biomassa) * 100
 
 plot(resid ~ predict.knn,
       xlab="Valor estimado",
       ylab="Resíduos (%)",
       col=2)
-abline(h=0)
+abline(h=0,col=4)
 
-x = c(7.820,15.670,31.800)
-y = c(-10.608204,-52.135922,-14.060258)
-
-plot( y ~ x,
-      xlab="Valor estimado",
-      ylab="Resíduos (%)",
-      col=2)
-abline(h=0)
 ########################## Gráfico de Resíduos
 
 
