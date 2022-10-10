@@ -181,14 +181,17 @@ F_MAE(teste$biomassa,predict.rf_par,teste)
 ########################## Random Forest
 
 ########################## Novos Casos
-
+dados_novos$biomassa<-NULL
+predict.melhor_caso<-predict(rna_par,dados_novos)
+dados_novos <-cbind(dados_novos,predict.melhor_caso)
+View(dados_novos)
 ########################## Novos Casos
 
 ########################## Gráfico de Resíduos
 
-resid = ((teste$biomassa - predict.knn)/teste$biomassa) * 100
+resid = ((teste$biomassa - predict.rna_par)/teste$biomassa) * 100
 
-plot(resid ~ predict.knn,
+plot(resid ~ predict.rna_par,
       xlab="Valor estimado",
       ylab="Resíduos (%)",
       col=2)

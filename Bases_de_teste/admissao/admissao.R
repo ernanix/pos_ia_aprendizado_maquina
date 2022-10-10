@@ -1,4 +1,6 @@
-library("caret")
+library(mlbench) 
+library(caret) 
+library(mice)
 library(Metrics)
 
 ##Maquina MP
@@ -9,9 +11,10 @@ setwd('/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste')
 barra ="/"
 
 dados <- read.csv(file = paste('admissao','admissao.csv',sep =barra))
+dados_novos <- read.csv(file = paste('admissao','admissao_novos.csv',sep =barra))
 
-set.seed(728078902)
 ### Cria arquivos de treino e teste
+set.seed(728078902)
 ind <- createDataPartition(dados$ChanceOfAdmit, p=0.80, list = FALSE)
 treino <- dados[ind,]
 teste <- dados[-ind,]
@@ -43,31 +46,23 @@ F_PEARSON <- function(observado,predito) {
 }
 
 ########################## KNN
+set.seed(728078902)
 tuneGrid <- expand.grid(k = c(1,3,5,7,9))
-### Executa o Knn com esse grid
-knn <- train(ChanceOfAdmit ~ ., data = treino, method = "knn",
-             tuneGrid=tuneGrid)
+knn <- train(ChanceOfAdmit ~ ., data = treino, method = "knn",tuneGrid=tuneGrid)
 knn
-### Aplica o modelo no arquivo de teste
 predict.knn <- predict(knn, teste)
 
-### Mostra as métricas
 F_r2(teste$ChanceOfAdmit,predict.knn)
 F_SYX(teste$ChanceOfAdmit,predict.knn,teste)
 F_PEARSON(teste$ChanceOfAdmit,predict.knn)
 F_RMSE(teste$ChanceOfAdmit,predict.knn,teste)
 F_MAE(teste$ChanceOfAdmit,predict.knn,teste)
-
-### Novos casos
-predict.knn <- predict(knn, dados_novos)
-dados_novos <- cbind(dados_novos, predict.knn)
 ########################## KNN
 
 ########################## RNA
-### Treino com Hold-Out
+set.seed(728078902)
 rna <- train(ChanceOfAdmit~., data=treino, method="nnet", linout=T, trace=FALSE)
 rna
-
 predict.rna <- predict(rna, teste)
 
 ### Mostra as métricas
@@ -78,6 +73,7 @@ F_RMSE(teste$ChanceOfAdmit,predict.rna,teste)
 F_MAE(teste$ChanceOfAdmit,predict.rna,teste)
 
 ### CV
+set.seed(728078902)
 control <- trainControl(method = "cv", number = 10)
 rna_cv <- train(ChanceOfAdmit~., data=treino, method="nnet", trainControl=control, linout=T, trace=F)
 rna_cv
@@ -89,88 +85,113 @@ F_RMSE(teste$ChanceOfAdmit,predict.rna_cv,teste)
 F_MAE(teste$ChanceOfAdmit,predict.rna_cv,teste)
 
 ###Parametrização
+set.seed(728078902)
 tuneGrid <- expand.grid(size = seq(from = 1, to = 10, by = 1), decay = seq(from = 0.1, to = 0.9, by = 0.3))
 rna_par <- train(ChanceOfAdmit~., data=treino, method="nnet", trainControl=control, tuneGrid=tuneGrid, linout=T, MaxNWts=10000, maxit=2000, trace=F)
 rna_par
 predict.rna_par <- predict(rna_par, teste)
+
 F_r2(teste$ChanceOfAdmit,predict.rna_par)
 F_SYX(teste$ChanceOfAdmit,predict.rna_par,teste)
 F_PEARSON(teste$ChanceOfAdmit,predict.rna_par)
 F_RMSE(teste$ChanceOfAdmit,predict.rna_par,teste)
 F_MAE(teste$ChanceOfAdmit,predict.rna_par,teste)
+
 ########################## RNA
 
 ########################## SVN
-### Treinar SVM com a base de Treino 
-svm <- train(ChanceOfAdmit~., data=treino, method="svmRadial") 
+set.seed(728078902)
+svm <- train(ChanceOfAdmit~., data=treino, method="svmRadial")
+svm
+predict.svm <- predict(svm, teste)
 
-### Aplicar modelos treinados na base de Teste
-predicoes.svm <- predict(svm, teste)
-
-### Calcular as métricas
-rmse(teste$ChanceOfAdmit, predicoes.svm)
-r2(predicoes.svm,teste$ChanceOfAdmit)
+F_r2(teste$ChanceOfAdmit,predict.svm)
+F_SYX(teste$ChanceOfAdmit,predict.svm,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.svm)
+F_RMSE(teste$ChanceOfAdmit,predict.svm,teste)
+F_MAE(teste$ChanceOfAdmit,predict.svm,teste)
 
 #### Cross-validation SVM
+set.seed(728078902)
 ctrl <- trainControl(method = "cv", number = 10)
-svm2 <- train(ChanceOfAdmit~., data=treino, method="svmRadial", trControl=ctrl)
+svm_cv <- train(ChanceOfAdmit~., data=treino, method="svmRadial", trControl=ctrl)
+svm_cv
+predict.svm_cv<- predict(svm_cv, teste)
 
-###Aplicar modelos treinados na base de Teste
-predicoes.svm2 <- predict(svm2, teste)
+F_r2(teste$ChanceOfAdmit,predict.svm_cv)
+F_SYX(teste$ChanceOfAdmit,predict.svm_cv,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.svm_cv)
+F_RMSE(teste$ChanceOfAdmit,predict.svm_cv,teste)
+F_MAE(teste$ChanceOfAdmit,predict.svm_cv,teste)
 
-### Calcular as métricas
-rmse(teste$ChanceOfAdmit, predicoes.svm2)
-r2(predicoes.svm2 ,teste$ChanceOfAdmit)
-
-#### Vários C e sigma
+#### Parametrização
+set.seed(728078902)
 tuneGrid = expand.grid(C=c(1, 2, 10, 50, 100), sigma=c(.01, .015, 0.2))
-svm3 <- train(ChanceOfAdmit~., data=treino, method="svmRadial", trControl=ctrl, tuneGrid=tuneGrid)
+svm_par <- train(ChanceOfAdmit~., data=treino, method="svmRadial", trControl=ctrl, tuneGrid=tuneGrid)
+svm_par
+predict.svm_par <- predict(svm_par, teste)
 
-### 6. Aplicar modelos treinados na base de Teste
-predicoes.svm3 <- predict(svm3, teste)
-### Calcular as métricas
-rmse(teste$ChanceOfAdmit, predicoes.svm3)
-r2(predicoes.svm3,teste$ChanceOfAdmit)
-
-### Novos casos
-predict.svm <- predict(svm, dados_novos)
-dados_novos <- cbind(dados_novos, predict.svm)
-predict.svm2 <- predict(svm2, dados_novos)
-dados_novos <- cbind(dados_novos, predict.svm2)
-predict.svm3 <- predict(svm3, dados_novos)
-dados_novos <- cbind(dados_novos, predict.svm3)
-
+F_r2(teste$ChanceOfAdmit,predict.svm_par)
+F_SYX(teste$ChanceOfAdmit,predict.svm_par,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.svm_par)
+F_RMSE(teste$ChanceOfAdmit,predict.svm_par,teste)
+F_MAE(teste$ChanceOfAdmit,predict.svm_par,teste)
 ########################## SVN
 
 ########################## Random Forest
-
+set.seed(728078902)
 rf <- train(ChanceOfAdmit~.,data=treino,method="rf")
-predicoes.rf <- predict(rf,teste)
+rf
+predict.rf <- predict(rf,teste)
 
-rmse(teste$ChanceOfAdmit,predicoes.rf)
-r2(predicoes.rf,teste$ChanceOfAdmit)
+F_r2(teste$ChanceOfAdmit,predict.rf)
+F_SYX(teste$ChanceOfAdmit,predict.rf,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.rf)
+F_RMSE(teste$ChanceOfAdmit,predict.rf,teste)
+F_MAE(teste$ChanceOfAdmit,predict.rf,teste)
 
 ##Cross Validation
+set.seed(728078902)
 ctrl <- trainControl(method="cv",number = 10)
+rf_cv <- train(ChanceOfAdmit~.,data=treino,method="rf",trControl=ctrl)
+rf_cv
+predict.rf_cv <- predict(rf_cv,teste)
 
-rf2 <- train(ChanceOfAdmit~.,data=treino,method="rf",trControl=ctrl)
-predicoes.rf2 <- predict(rf2,teste)
+F_r2(teste$ChanceOfAdmit,predict.rf_cv)
+F_SYX(teste$ChanceOfAdmit,predict.rf_cv,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.rf_cv)
+F_RMSE(teste$ChanceOfAdmit,predict.rf_cv,teste)
+F_MAE(teste$ChanceOfAdmit,predict.rf_cv,teste)
 
-rmse(teste$ChanceOfAdmit,predicoes.rf2)
-r2(predicoes.rf2,teste$ChanceOfAdmit)
 
-##Varios mtry
+##parametrização
+set.seed(728078902)
 tuneGrid = expand.grid(mtry=c(2,5,7,9))
+rf_par <- train(ChanceOfAdmit~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
+rf_par
+predict.rf_par <- predict(rf_par,teste)
 
-rf3 <- train(ChanceOfAdmit~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
-predicoes.rf3 <- predict(rf3,teste)
-rmse(teste$ChanceOfAdmit,predicoes.rf3)
-r2(predicoes.rf3,teste$ChanceOfAdmit)
+F_r2(teste$ChanceOfAdmit,predict.rf_par)
+F_SYX(teste$ChanceOfAdmit,predict.rf_par,teste)
+F_PEARSON(teste$ChanceOfAdmit,predict.rf_par)
+F_RMSE(teste$ChanceOfAdmit,predict.rf_par,teste)
+F_MAE(teste$ChanceOfAdmit,predict.rf_par,teste)
 
-predict.rf <- predict(rf, dados_novos)
-dados_novos <- cbind(dados_novos, predict.rf)
-predict.rf2 <- predict(rf2, dados_novos)
-dados_novos <- cbind(dados_novos, predict.rf2)
-predict.rf3 <- predict(rf3, dados_novos)
-dados_novos <- cbind(dados_novos, predict.rf3)
 ########################## Random Forest
+
+########################## Novos Casos
+predict.svm <- predict(svm, dados_novos)
+dados_novos <- cbind(dados_novos, predict.svm)
+########################## Novos Casos
+
+########################## Gráfico de Resíduos
+
+resid = ((teste$ChanceOfAdmit - predict.rna_par)/teste$ChanceOfAdmit) * 100
+
+plot(resid ~ predict.rna_par,
+     xlab="Valor estimado",
+     ylab="Resíduos (%)",
+     col=2)
+abline(h=0,col=4)
+
+########################## Gráfico de Resíduos

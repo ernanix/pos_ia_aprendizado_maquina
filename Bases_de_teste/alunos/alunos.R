@@ -1,8 +1,3 @@
-install.packages("caret") 
-install.packages("e1071") 
-install.packages("mlbench") 
-install.packages("mice")
-install.packages("Metrics")
 library(mlbench) 
 library(caret) 
 library(mice)
@@ -16,13 +11,10 @@ setwd('/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste')
 barra ="/"
 
 dados <- read.csv(file = paste('alunos','alunos.csv',sep =barra))
-
 dados_novos <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/alunos/alunos_novos.csv')
 
-###Set seed
-set.seed(728078902)
-
 ### Cria arquivos de treino e teste
+set.seed(728078902)
 ind <- createDataPartition(dados$G3, p=0.80, list = FALSE)
 treino <- dados[ind,]
 teste <- dados[-ind,]
@@ -54,14 +46,11 @@ F_PEARSON <- function(observado,predito) {
 }
 
 ########################## KNN
-### Prepara um grid com os valores de k que serão usados 
+set.seed(728078902)
 tuneGrid <- expand.grid(k = c(1,3,5,7,9))
-
-### Executa o Knn com esse grid
 knn <- train(G3 ~ ., data = treino, method = "knn",
              tuneGrid=tuneGrid)
 knn
-### Aplica o modelo no arquivo de teste
 predict.knn <- predict(knn, teste)
 
 ### Mostra as métricas
@@ -70,14 +59,12 @@ F_SYX(teste$G3,predict.knn,teste)
 F_PEARSON(teste$G3,predict.knn)
 F_RMSE(teste$G3,predict.knn,teste)
 F_MAE(teste$G3,predict.knn,teste)
-
 ########################## KNN
 
 ########################## RNA
-### Treino com Hold-Out
+set.seed(728078902)
 rna <- train(G3~., data=treino, method="nnet", linout=T, trace=FALSE)
 rna
-
 predict.rna <- predict(rna, teste)
 
 ### Mostra as métricas
@@ -88,10 +75,12 @@ F_RMSE(teste$G3,predict.rna,teste)
 F_MAE(teste$G3,predict.rna,teste)
 
 ### CV
+set.seed(728078902)
 control <- trainControl(method = "cv", number = 10)
 rna_cv <- train(G3~., data=treino, method="nnet", trainControl=control, linout=T, trace=F)
 rna_cv
 predict.rna_cv <- predict(rna_cv, teste)
+
 F_r2(teste$G3,predict.rna_cv)
 F_SYX(teste$G3,predict.rna_cv,teste)
 F_PEARSON(teste$G3,predict.rna_cv)
@@ -99,10 +88,12 @@ F_RMSE(teste$G3,predict.rna_cv,teste)
 F_MAE(teste$G3,predict.rna_cv,teste)
 
 ###Parametrização
+set.seed(728078902)
 tuneGrid <- expand.grid(size = seq(from = 1, to = 10, by = 1), decay = seq(from = 0.1, to = 0.9, by = 0.3))
 rna_par <- train(G3~., data=treino, method="nnet", trainControl=control, tuneGrid=tuneGrid, linout=T, MaxNWts=10000, maxit=2000, trace=F)
 rna_par
 predict.rna_par <- predict(rna_par, teste)
+
 F_r2(teste$G3,predict.rna_par)
 F_SYX(teste$G3,predict.rna_par,teste)
 F_PEARSON(teste$G3,predict.rna_par)
@@ -111,71 +102,80 @@ F_MAE(teste$G3,predict.rna_par,teste)
 ########################## RNA
 
 ########################## SVN
-### Treinar SVM com a base de Treino 
+set.seed(728078902)
 svm <- train(G3~., data=treino, method="svmRadial") 
+svm
+predict.svm <- predict(svm, teste)
 
-### Aplicar modelos treinados na base de Teste
-predicoes.svm <- predict(svm, teste)
-
-### Calcular as métricas
-rmse(teste$G3, predicoes.svm)
-r2(predicoes.svm,teste$G3)
+F_r2(teste$G3,predict.rna_par)
+F_SYX(teste$G3,predict.rna_par,teste)
+F_PEARSON(teste$G3,predict.rna_par)
+F_RMSE(teste$G3,predict.rna_par,teste)
+F_MAE(teste$G3,predict.rna_par,teste)
 
 #### Cross-validation SVM
+set.seed(728078902)
 ctrl <- trainControl(method = "cv", number = 10)
-svm2 <- train(G3~., data=treino, method="svmRadial", trControl=ctrl)
+svm_cv <- train(G3~., data=treino, method="svmRadial", trControl=ctrl)
+svm_cv
+predict.svm_cv <- predict(svm_cv, teste)
 
-### 6. Aplicar modelos treinados na base de Teste
-predicoes.svm2 <- predict(svm2, teste)
+F_r2(teste$G3,predict.svm_cv)
+F_SYX(teste$G3,predict.svm_cv,teste)
+F_PEARSON(teste$G3,predict.svm_cv)
+F_RMSE(teste$G3,predict.svm_cv,teste)
+F_MAE(teste$G3,predict.svm_cv,teste)
 
-### Calcular as métricas
-rmse(teste$G3, predicoes.svm2)
-r2(predicoes.svm2 ,teste$G3)
-
-#### Vários C e sigma
+#### Parametrização
+set.seed(728078902)
 tuneGrid = expand.grid(C=c(1, 2, 10, 50, 100), sigma=c(.01, .015, 0.2))
-svm3 <- train(G3~., data=treino, method="svmRadial", trControl=ctrl, tuneGrid=tuneGrid)
+svm_par <- train(G3~., data=treino, method="svmRadial", trControl=ctrl, tuneGrid=tuneGrid)
+predict.svm_par <- predict(svm_par, teste)
 
-### 6. Aplicar modelos treinados na base de Teste
-predicoes.svm3 <- predict(svm3, teste)
-### Calcular as métricas
-rmse(teste$G3, predicoes.svm3)
-r2(predicoes.svm3,teste$G3)
-
-### Novos casos
-predict.svm <- predict(svm, dados_novos)
-dados_novos <- cbind(dados_novos, predict.svm)
-predict.svm2 <- predict(svm2, dados_novos)
-dados_novos <- cbind(dados_novos, predict.svm2)
-predict.svm3 <- predict(svm3, dados_novos)
-dados_novos <- cbind(dados_novos, predict.svm3)
+F_r2(teste$G3,predict.svm_par)
+F_SYX(teste$G3,predict.svm_par,teste)
+F_PEARSON(teste$G3,predict.svm_par)
+F_RMSE(teste$G3,predict.svm_par,teste)
+F_MAE(teste$G3,predict.svm_par,teste)
 
 ########################## SVN
 
 ########################## Random Forest
-
+set.seed(728078902)
 rf <- train(G3~.,data=treino,method="rf")
-predicoes.rf <- predict(rf,teste)
+rf
+predict.rf <- predict(rf,teste)
 
-rmse(teste$G3,predicoes.rf)
-r2(predicoes.rf,teste$G3)
+F_r2(teste$G3,predict.rf)
+F_SYX(teste$G3,predict.rf,teste)
+F_PEARSON(teste$G3,predict.rf)
+F_RMSE(teste$G3,predict.rf,teste)
+F_MAE(teste$G3,predict.rf,teste)
 
 ##Cross Validation
+set.seed(728078902)
 ctrl <- trainControl(method="cv",number = 10)
+rf_cv <- train(G3~.,data=treino,method="rf",trControl=ctrl)
+rf_cv
+predict.rf_cv <- predict(rf_cv,teste)
 
-rf2 <- train(G3~.,data=treino,method="rf",trControl=ctrl)
-predicoes.rf2 <- predict(rf2,teste)
-
-rmse(teste$G3,predicoes.rf2)
-r2(predicoes.rf2,teste$G3)
+F_r2(teste$G3,predict.rf_cv)
+F_SYX(teste$G3,predict.rf_cv,teste)
+F_PEARSON(teste$G3,predict.rf_cv)
+F_RMSE(teste$G3,predict.rf_cv,teste)
+F_MAE(teste$G3,predict.rf_cv,teste)
 
 ##Varios mtry
 tuneGrid = expand.grid(mtry=c(2,5,7,9))
+rf_par <- train(G3~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
+rf_par
+predict.rf_par <- predict(rf_par,teste)
 
-rf3 <- train(G3~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
-predicoes.rf3 <- predict(rf3,teste)
-rmse(teste$G3,predicoes.rf3)
-r2(predicoes.rf3,teste$G3)
+F_r2(teste$G3,predict.rf_par)
+F_SYX(teste$G3,predict.rf_par,teste)
+F_PEARSON(teste$G3,predict.rf_par)
+F_RMSE(teste$G3,predict.rf_par,teste)
+F_MAE(teste$G3,predict.rf_par,teste)
 
 predict.rf <- predict(rf, dados_novos)
 dados_novos <- cbind(dados_novos, predict.rf)
@@ -184,4 +184,20 @@ dados_novos <- cbind(dados_novos, predict.rf2)
 predict.rf3 <- predict(rf3, dados_novos)
 dados_novos <- cbind(dados_novos, predict.rf3)
 ########################## Random Forest
+
+########################## Novos Casos
+
+########################## Novos Casos
+
+########################## Gráfico de Resíduos
+
+resid = ((teste$G3 - predict.rna_par)/teste$G3) * 100
+
+plot(resid ~ predict.rna_par,
+     xlab="Valor estimado",
+     ylab="Resíduos (%)",
+     col=2)
+abline(h=0,col=4)
+
+########################## Gráfico de Resíduos
 
