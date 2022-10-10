@@ -1,12 +1,12 @@
 ##Maquina MP
-setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste')
+setwd('C:\\Users\\escneto\\Documents\\Estudos\\Pos_IA_UFPR\\pos_ia_aprendizado_maquina\\Bases_de_teste\\AGRUPAMENTO')
 ##Note
 setwd('/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/AGRUPAMENTO')
 
 data("iris")
 dados <- iris
 set.seed(728078902)
-irisCluster <- kmeans(iris[,3:4],3)
+irisCluster <- kmeans(iris,3)
 irisCluster
 resultado <- cbind(dados,irisCluster$cluster)
 resultado

@@ -166,7 +166,7 @@ F_MAE(teste$ChanceOfAdmit,predict.rf_cv,teste)
 
 ##parametrização
 set.seed(728078902)
-tuneGrid = expand.grid(mtry=c(2,5,7,9))
+tuneGrid = expand.grid(mtry=c(1,2,5,7,9,11))
 rf_par <- train(ChanceOfAdmit~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
 rf_par
 predict.rf_par <- predict(rf_par,teste)
@@ -180,15 +180,17 @@ F_MAE(teste$ChanceOfAdmit,predict.rf_par,teste)
 ########################## Random Forest
 
 ########################## Novos Casos
-predict.svm <- predict(svm, dados_novos)
-dados_novos <- cbind(dados_novos, predict.svm)
+dados_novos$Chance.ofAdmit <- NULL
+predict.melhor_caso <- predict(rf_cv, dados_novos)
+dados_novos <- cbind(dados_novos, predict.melhor_caso)
+View(dados_novos)
 ########################## Novos Casos
 
 ########################## Gráfico de Resíduos
 
-resid = ((teste$ChanceOfAdmit - predict.rna_par)/teste$ChanceOfAdmit) * 100
+resid = ((teste$ChanceOfAdmit - predict.rf_cv)/teste$ChanceOfAdmit) * 100
 
-plot(resid ~ predict.rna_par,
+plot(resid ~ predict.rf_cv,
      xlab="Valor estimado",
      ylab="Resíduos (%)",
      col=2)

@@ -11,7 +11,7 @@ setwd('/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste')
 barra ="/"
 
 dados <- read.csv(file = paste('alunos','alunos.csv',sep =barra))
-dados_novos <- read.csv(file = '/Users/MPPR/Documents/Pos_IA/pos_ia_aprendizado_maquina/Bases_de_teste/alunos/alunos_novos.csv')
+dados_novos <- read.csv(file = paste('alunos','alunos_novos.csv',sep =barra))
 
 ### Cria arquivos de treino e teste
 set.seed(728078902)
@@ -107,11 +107,11 @@ svm <- train(G3~., data=treino, method="svmRadial")
 svm
 predict.svm <- predict(svm, teste)
 
-F_r2(teste$G3,predict.rna_par)
-F_SYX(teste$G3,predict.rna_par,teste)
-F_PEARSON(teste$G3,predict.rna_par)
-F_RMSE(teste$G3,predict.rna_par,teste)
-F_MAE(teste$G3,predict.rna_par,teste)
+F_r2(teste$G3,predict.svm)
+F_SYX(teste$G3,predict.svm,teste)
+F_PEARSON(teste$G3,predict.svm)
+F_RMSE(teste$G3,predict.svm,teste)
+F_MAE(teste$G3,predict.svm,teste)
 
 #### Cross-validation SVM
 set.seed(728078902)
@@ -129,7 +129,8 @@ F_MAE(teste$G3,predict.svm_cv,teste)
 #### Parametrização
 set.seed(728078902)
 tuneGrid = expand.grid(C=c(1, 2, 10, 50, 100), sigma=c(.01, .015, 0.2))
-svm_par <- train(G3~., data=treino, method="svmRadial", trControl=ctrl, tuneGrid=tuneGrid)
+svm_par <- train(G3~., data=treino, method="svmRadial", tuneGrid=tuneGrid)
+svm_par
 predict.svm_par <- predict(svm_par, teste)
 
 F_r2(teste$G3,predict.svm_par)
@@ -166,7 +167,8 @@ F_RMSE(teste$G3,predict.rf_cv,teste)
 F_MAE(teste$G3,predict.rf_cv,teste)
 
 ##Varios mtry
-tuneGrid = expand.grid(mtry=c(2,5,7,9))
+set.seed(728078902)
+tuneGrid = expand.grid(mtry=c(21,31,41,43,45))
 rf_par <- train(G3~.,data=treino,method="rf",trControl=ctrl,tuneGrid=tuneGrid)
 rf_par
 predict.rf_par <- predict(rf_par,teste)
@@ -186,14 +188,18 @@ dados_novos <- cbind(dados_novos, predict.rf3)
 ########################## Random Forest
 
 ########################## Novos Casos
+dados_novos$G3 <- NULL
+predict.melhor_modelo <- predict(rf_cv,dados_novos)
+dados_novos <- cbind(dados_novos, predict.melhor_modelo)
+View(dados_novos)
 
 ########################## Novos Casos
 
 ########################## Gráfico de Resíduos
 
-resid = ((teste$G3 - predict.rna_par)/teste$G3) * 100
+resid = ((teste$G3 - predict.rf_cv)/teste$G3) * 100
 
-plot(resid ~ predict.rna_par,
+plot(resid ~ predict.rf_cv,
      xlab="Valor estimado",
      ylab="Resíduos (%)",
      col=2)
