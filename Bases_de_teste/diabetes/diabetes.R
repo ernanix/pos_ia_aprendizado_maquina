@@ -57,8 +57,8 @@ confusionMatrix(predict.rna_par, as.factor(teste$diabetes))
 ########################## SVN
 ###Hold-out 
 set.seed(728078902)
-svm
 svm <- train(diabetes~., data=treino, method="svmRadial") 
+svm
 predict.svm <- predict(svm, teste)
 confusionMatrix(predict.svm, as.factor(teste$diabetes))
 
@@ -105,7 +105,64 @@ confusionMatrix(predict.rf_par,as.factor(teste$diabetes))
 
 ########################## Novos casos
 dados_novos$diabetes <-NULL
-predict.melhor_modelo <- predict(rna_par,dados_novos)
+predict.melhor_modelo <- predict(svm_par,dados_novos)
 dados_novos <-cbind(dados_novos,predict.melhor_modelo)
 View(dados_novos)
 ########################## Novos casos
+
+########################## Analise ROC
+cmknn <- confusionMatrix(predict.knn,as.factor(teste$diabetes))
+cmrna <- confusionMatrix(predict.rna,as.factor(teste$diabetes))
+cmrna_cv <- confusionMatrix(predict.rna_cv,as.factor(teste$diabetes))
+cmrna_par <- confusionMatrix(predict.rna_par,as.factor(teste$diabetes))
+cmsvm <- confusionMatrix(predict.svm,as.factor(teste$diabetes))
+cmsvm_cv <- confusionMatrix(predict.svm_cv,as.factor(teste$diabetes))
+cmsvm_par <- confusionMatrix(predict.svm_par,as.factor(teste$diabetes))
+cmrf <- confusionMatrix(predict.rf,as.factor(teste$diabetes))
+cmrf_cv <- confusionMatrix(predict.rf_cv,as.factor(teste$diabetes))
+cmrf_par <- confusionMatrix(predict.rf_par,as.factor(teste$diabetes))
+
+
+
+####Funçao
+df.ROC <- data.frame(
+        modelo = c('knn','rna','rna_cv','rna_par','svm','svm_cv','svm_par','rf','rf_cv','rf_par'),
+        X = c(rep(0,10)),
+        Y = c(rep(0,10)),
+        distancia = c(rep(0,10))
+  )
+
+func_ROC <- function(df,cm,modelo) {
+  VP <- cm[1,1]
+  FP <- cm[2,1]
+  VN <- cm[2,2]
+  FN <- cm[1,2]
+  
+  X <- 1-(VN / (VN+FP))
+  Y <- VP / (VP+FN)
+  distancia <- sqrt(X^2 + (Y-1)^2)
+  
+  df[df$modelo==modelo,"X"] <- X
+  df[df$modelo==modelo,"Y"] <- Y
+  df[df$modelo==modelo,"distancia"] <- distancia
+  
+  return (df)
+}
+
+df.ROC <- func_ROC(df.ROC,cmknn$table,"knn")
+df.ROC <- func_ROC(df.ROC,cmrna$table,"rna")
+df.ROC <- func_ROC(df.ROC,cmrna_cv$table,"rna_cv")
+df.ROC <- func_ROC(df.ROC,cmrna_par$table,"rna_par")
+df.ROC <- func_ROC(df.ROC,cmsvm$table,"svm")
+df.ROC <- func_ROC(df.ROC,cmsvm_cv$table,"svm_cv")
+df.ROC <- func_ROC(df.ROC,cmsvm_par$table,"svm_par")
+df.ROC <- func_ROC(df.ROC,cmrf$table,"rf")
+df.ROC <- func_ROC(df.ROC,cmrf_cv$table,"rf_cv")
+df.ROC <- func_ROC(df.ROC,cmrf_par$table,"rf_par")
+
+
+ggplot(df.ROC, aes(x=X, y=Y, label=modelo)) +
+  geom_point() +
+  labs(x="X", y="Y", title="Gráfico ROC") + geom_text(hjust=0, vjust=0)
+########################## Analise ROC
+

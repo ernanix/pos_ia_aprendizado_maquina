@@ -31,3 +31,22 @@ cancerCluster
 resultado <- cbind(dados,cancerCluster$cluster)
 resultado[2:12]
 
+############################
+
+library(klaR)
+dados <- read.csv(file = 'veiculos.csv')
+set.seed(728078902)
+veiculoCluster <- kmeans(dados[2:19],4)
+veiculoCluster
+resultado <- cbind(dados,veiculoCluster$cluster)
+resultado[2:21]
+
+############################
+
+library(klaR)
+dados <- read.csv(file = 'banco.csv')
+set.seed(728078902)
+bancoCluster <- kmodes(dados[0:8],2,iter.max = 10, weighted = FALSE)
+bancoCluster
+resultado <- cbind(dados,bancoCluster$cluster)
+resultado
